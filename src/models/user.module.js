@@ -2,21 +2,81 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 
 const userSchema = new mongoose.Schema({
-    name: {
+    username: {
         type: String,
-        required: [true, "The Name is Required"],
-        trim: true
+        required: [true, "The Username is Required"],
+        trim: true,
+        unique: true,
+        lowercase: true,
+        index: true
+    },
+    fullname: {
+        type: String,
+        required: [true, "The Fullname is Required"],
+        trim: true,
+        index: true
     },
     email: {
         type: String,
         required: [true, "The Email is Required"],
-        trim: true
+        trim: true,
+        unique: true,
+        lowercase: true
     },
     password: {
         type: String,
         required: [true, "The Password is Required"],
-        trim: true
+        trim: true,
+        minlength: [8, 'Password must be atleast 8 characters']
     },
+    avatar: {
+        public_id: String,
+        url: String
+    },
+    coverImage: {
+        public_id: String,
+        url: String
+    },
+    refreshToken: {
+        type: String,
+    },
+    watchHistory: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Video"
+    }],
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    //Channel specific fields
+    channelDescription: {
+        type: String,
+        default: ""
+    },
+    channelTags: {
+        type: [String],
+        default: []
+    },
+    socialLinks: {
+        x: String,
+        instagram: String,
+        website: String
+    },
+    notificationSettings: {
+        emailNotification: {
+            type: Boolean,
+            default: true
+        },
+        commentActivity: {
+            type: Boolean,
+            default: true
+        },
+    },
+    //Password reset fields
+    refreshPasswordToken: String,
+    resetPasswordExpiry: String,
+
+    //Admin role
     isAdmin: {
         type: Boolean,
         default: false
@@ -44,6 +104,6 @@ userSchema.pre("save", async function(){
 })
    
                 
-                                  
+//Compile the Schema to form  model
 const User = mongoose.model("User", userSchema)
 module.exports = User
